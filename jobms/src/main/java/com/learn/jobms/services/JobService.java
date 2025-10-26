@@ -1,12 +1,13 @@
 package com.learn.jobms.services;
 
 
+import com.learn.jobms.dto.JobWithCompanyDTO;
 import com.learn.jobms.models.Job;
 
 import java.util.List;
 
 public interface JobService {
-    List<Job> getAllJobs();
+    List<JobWithCompanyDTO> getAllJobs();
 
     void createJob(Job job);
 

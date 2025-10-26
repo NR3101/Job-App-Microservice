@@ -1,11 +1,14 @@
 package com.learn.jobms.services.impl;
 
 
+import com.learn.jobms.dto.JobWithCompanyDTO;
+import com.learn.jobms.external.Company;
 import com.learn.jobms.models.Job;
 import com.learn.jobms.repositories.JobRepository;
 import com.learn.jobms.services.JobService;
 import com.learn.common.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -18,8 +21,29 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<Job> getAllJobs() {
-        return jobRepository.findAll();
+    public List<JobWithCompanyDTO> getAllJobs() {
+        List<Job> jobs = jobRepository.findAll();
+
+        return jobs.stream()
+                .map(this::convertJobToJobWithCompanyDTO)
+                .toList();
+    }
+
+    // Helper method to convert Job to JobWithCompanyDTO
+    private JobWithCompanyDTO convertJobToJobWithCompanyDTO(Job job) {
+        JobWithCompanyDTO dto = new JobWithCompanyDTO();
+        dto.setJob(job);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String companyServiceUrl = "http://localhost:8081/api/v1/companies/" + job.getCompanyId();
+        try {
+            Company company = restTemplate.getForObject(companyServiceUrl, Company.class);
+            dto.setCompany(company);
+        } catch (Exception e) {
+            dto.setCompany(null);
+        }
+
+        return dto;
     }
 
     @Override

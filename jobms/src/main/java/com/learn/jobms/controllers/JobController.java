@@ -1,6 +1,7 @@
 package com.learn.jobms.controllers;
 
 
+import com.learn.jobms.dto.JobWithCompanyDTO;
 import com.learn.jobms.models.Job;
 import com.learn.jobms.services.JobService;
 import jakarta.validation.Valid;
@@ -20,7 +21,7 @@ public class JobController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Job>> findAll() {
+    public ResponseEntity<List<JobWithCompanyDTO>> findAll() {
         return ResponseEntity.ok(jobService.getAllJobs());
     }
 
