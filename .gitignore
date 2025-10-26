@@ -35,6 +35,19 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
+# Maven Wrapper
+mvnw
+mvnw.cmd
+.mvn/
+
+# Spring Boot Generated Files
+HELP.md
+*.cmd
+
+# Git files from subdirectories
+**/.gitignore
+**/.gitattributes
+
 # Gradle
 .gradle
 build/

@@ -1,7 +1,7 @@
 package com.learn.jobms.controllers;
 
 
-import com.learn.jobms.dto.JobWithCompanyDTO;
+import com.learn.jobms.dto.JobResponseDTO;
 import com.learn.jobms.models.Job;
 import com.learn.jobms.services.JobService;
 import jakarta.validation.Valid;
@@ -21,12 +21,12 @@ public class JobController {
     }
 
     @GetMapping
-    public ResponseEntity<List<JobWithCompanyDTO>> findAll() {
+    public ResponseEntity<List<JobResponseDTO>> findAll() {
         return ResponseEntity.ok(jobService.getAllJobs());
     }
 
     @GetMapping("/{jobId}")
-    public ResponseEntity<Job> findById(@PathVariable Long jobId) {
+    public ResponseEntity<JobResponseDTO> findById(@PathVariable Long jobId) {
         return ResponseEntity.ok(jobService.getJobById(jobId));
     }
 

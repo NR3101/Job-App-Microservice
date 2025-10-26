@@ -1,17 +1,17 @@
 package com.learn.jobms.services;
 
 
-import com.learn.jobms.dto.JobWithCompanyDTO;
+import com.learn.jobms.dto.JobResponseDTO;
 import com.learn.jobms.models.Job;
 
 import java.util.List;
 
 public interface JobService {
-    List<JobWithCompanyDTO> getAllJobs();
+    List<JobResponseDTO> getAllJobs();
 
     void createJob(Job job);
 
-    Job getJobById(Long jobId);
+    JobResponseDTO getJobById(Long jobId);
 
     void deleteJob(Long jobId);
 
