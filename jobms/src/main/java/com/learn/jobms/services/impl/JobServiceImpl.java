@@ -1,6 +1,8 @@
 package com.learn.jobms.services.impl;
 
 
+import com.learn.jobms.clients.CompanyClient;
+import com.learn.jobms.clients.ReviewClient;
 import com.learn.jobms.dto.JobResponseDTO;
 import com.learn.jobms.external.Company;
 import com.learn.jobms.external.Review;
@@ -10,9 +12,6 @@ import com.learn.jobms.repositories.JobRepository;
 import com.learn.jobms.services.JobService;
 import com.learn.common.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,13 +19,14 @@ import java.util.List;
 
 @Service
 public class JobServiceImpl implements JobService {
-    @Autowired
-    RestTemplate restTemplate;
-
     private final JobRepository jobRepository;
+    private final CompanyClient companyClient;
+    private final ReviewClient reviewClient;
 
-    public JobServiceImpl(JobRepository jobRepository) {
+    public JobServiceImpl(JobRepository jobRepository, CompanyClient companyClient, ReviewClient reviewClient) {
         this.jobRepository = jobRepository;
+        this.companyClient = companyClient;
+        this.reviewClient = reviewClient;
     }
 
     @Override
@@ -40,17 +40,8 @@ public class JobServiceImpl implements JobService {
 
     // Helper method to convert Job to JobResponseDTO(including Company and Review details)
     private JobResponseDTO convertJobToJobResponseDTO(Job job) {
-        Company company = restTemplate.getForObject(
-                "lb://COMPANY-SERVICE/api/v1/companies/" + job.getCompanyId(),
-                Company.class
-        );
-        ResponseEntity<List<Review>> reviewsResponse = restTemplate.exchange("lb://REVIEW-SERVICE/api/v1/reviews?companyId=" + job.getCompanyId(),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Review>>() {
-                });
-
-        List<Review> reviews = reviewsResponse.getBody();
+        Company company = companyClient.getCompany(job.getCompanyId());
+        List<Review> reviews = reviewClient.getReviews(job.getCompanyId());
 
         return JobMapper.mapToJobResponseDTO(job, company, reviews);
     }
