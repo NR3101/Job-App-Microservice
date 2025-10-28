@@ -1,13 +1,18 @@
 spring:
   application:
     name: config-server
+  profiles:
+    active: native
   cloud:
     config:
       server:
-        git:
-          uri: https://github.com/NR3101/Job-App-Config-Server.git
+        native:
+          search-locations: classpath:/config
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+server:
+  port: 8888

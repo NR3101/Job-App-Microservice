@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: company-service
+              uri: lb://company-service # As we're using Eureka for service discovery
+              predicates:
+                - Path=/api/v1/companies/**
+            - id: job-service
+              uri: lb://job-service
+              predicates:
+                - Path=/api/v1/jobs/**
+            - id: review-service
+              uri: lb://review-service
+              predicates:
+                - Path=/api/v1/reviews/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

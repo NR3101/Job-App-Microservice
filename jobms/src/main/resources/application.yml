@@ -1,27 +1,5 @@
 spring:
   application:
     name: job-service
-  datasource:
-    url: jdbc:postgresql://ep-hidden-cell-ah1kl316-pooler.c-3.us-east-1.aws.neon.tech/jobms?sslmode=require&channel_binding=require
-    username: neondb_owner
-    password: npg_7aeLrDq1MjcO
-  jpa:
-    database: postgresql
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-
-server:
-  port: 8082
+  config:
+    import: optional:configserver:http://localhost:8888
