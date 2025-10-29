@@ -23,6 +23,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    public List<Review> getReviewsByCompanyIds(List<Long> companyIds) {
+        return reviewRepository.findByCompanyIdIn(companyIds);
+    }
+
+    @Override
     public void createReview(Long companyId, Review review) {
         if (companyId != null) {
             review.setCompanyId(companyId);

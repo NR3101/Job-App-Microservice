@@ -9,6 +9,8 @@ import java.util.List;
 public interface ReviewService {
     List<Review> getAllReviewsByCompanyId(Long companyId);
 
+    List<Review> getReviewsByCompanyIds(List<Long> companyIds);
+
     void createReview(Long companyId, Review review);
 
     Review findByReviewId(Long reviewId);

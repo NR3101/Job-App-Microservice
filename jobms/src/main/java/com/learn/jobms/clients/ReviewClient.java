@@ -11,4 +11,7 @@ import java.util.List;
 public interface ReviewClient {
     @GetMapping("/api/v1/reviews")
     List<Review> getReviews(@RequestParam("companyId") Long companyId);
+
+    @GetMapping("/api/v1/reviews/bulk")
+    List<Review> getReviewsByCompanyIds(@RequestParam("companyIds") List<Long> companyIds);
 }

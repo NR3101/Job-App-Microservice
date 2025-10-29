@@ -1,3 +1,6 @@
+# Configuration file for Job Service
+
+# Spring Boot application settings
 spring:
   datasource:
     url: jdbc:postgresql://ep-hidden-cell-ah1kl316-pooler.c-3.us-east-1.aws.neon.tech/jobms?sslmode=require&channel_binding=require
@@ -9,6 +12,7 @@ spring:
       ddl-auto: update
     show-sql: true
 
+# Eureka client configuration
 eureka:
   client:
     service-url:
@@ -16,10 +20,49 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
+# Management and Actuator settings
 management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
   tracing:
     sampling:
       probability: 1.0
 
+# Resilience4j configuration for Circuit Breaker, Rate Limiter, and Retry
+resilience4j:
+  circuitbreaker:
+    instances:
+      jobServiceCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        slidingWindowType: COUNT_BASED
+  rateLimiter:
+    instances:
+      jobServiceRateLimiter:
+        registerHealthIndicator: true
+        limitForPeriod: 3
+        limitRefreshPeriod: 4s
+        timeoutDuration: 0
+  retry:
+    instances:
+      jobServiceRetry:
+        maxAttempts: 3
+        waitDuration: 2s
+
+
+# Server port configuration
 server:
   port: 8082

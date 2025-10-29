@@ -11,11 +11,12 @@ import com.learn.jobms.models.Job;
 import com.learn.jobms.repositories.JobRepository;
 import com.learn.jobms.services.JobService;
 import com.learn.common.exceptions.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class JobServiceImpl implements JobService {
@@ -30,11 +31,56 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @RateLimiter(name = "jobServiceRateLimiter")
+//    @CircuitBreaker(name = "jobServiceCircuitBreaker", fallbackMethod = "getAllJobsFallback")
+//    @Retry(name = "jobServiceRetry", fallbackMethod = "getAllJobsFallback")
     public List<JobResponseDTO> getAllJobs() {
         List<Job> jobs = jobRepository.findAll();
 
+        if (jobs.isEmpty()) {
+            return List.of();
+        }
+
+        // Extract unique company IDs from all jobs
+        List<Long> companyIds = jobs.stream()
+                .map(Job::getCompanyId)
+                .distinct()
+                .toList();
+
+        // Fetch all companies and reviews in bulk (2 calls instead of N*2 calls)
+        Map<Long, Company> companyMap;
+        Map<Long, List<Review>> reviewMap;
+
+        try {
+            List<Company> companies = companyClient.getCompaniesByIds(companyIds);
+            companyMap = companies.stream()
+                    .collect(Collectors.toMap(Company::getId, company -> company));
+
+            List<Review> allReviews = reviewClient.getReviewsByCompanyIds(companyIds);
+            reviewMap = allReviews.stream()
+                    .collect(Collectors.groupingBy(Review::getCompanyId));
+        } catch (Exception e) {
+            // Fallback to basic job info if external services fail
+            return jobs.stream()
+                    .map(job -> JobMapper.mapToJobResponseDTO(job, null, null))
+                    .toList();
+        }
+
+        // Map jobs to DTOs using the pre-fetched data
         return jobs.stream()
-                .map(this::convertJobToJobResponseDTO)
+                .map(job -> {
+                    Company company = companyMap.get(job.getCompanyId());
+                    List<Review> reviews = reviewMap.getOrDefault(job.getCompanyId(), List.of());
+                    return JobMapper.mapToJobResponseDTO(job, company, reviews);
+                })
+                .toList();
+    }
+
+    // Fallback method for getAllJobs
+    public List<JobResponseDTO> getAllJobsFallback(Throwable t) {
+        List<Job> jobs = jobRepository.findAll();
+        return jobs.stream()
+                .map(job -> JobMapper.mapToJobResponseDTO(job, null, null))
                 .toList();
     }
 

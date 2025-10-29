@@ -24,6 +24,11 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getAllReviewsByCompanyId(companyId));
     }
 
+    @GetMapping("/bulk")
+    public ResponseEntity<List<Review>> getReviewsByCompanyIds(@RequestParam("companyIds") List<Long> companyIds) {
+        return ResponseEntity.ok(reviewService.getReviewsByCompanyIds(companyIds));
+    }
+
     @GetMapping("/{reviewId}")
     public ResponseEntity<Review> getReviewById(@PathVariable Long reviewId) {
         return ResponseEntity.ok(reviewService.findByReviewId(reviewId));

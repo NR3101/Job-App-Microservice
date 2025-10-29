@@ -34,6 +34,11 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    public List<Company> getCompaniesByIds(List<Long> ids) {
+        return companyRepository.findAllById(ids);
+    }
+
+    @Override
     public void updateCompany(Long id, Company company) {
         Company existingCompany = companyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id: " + id));

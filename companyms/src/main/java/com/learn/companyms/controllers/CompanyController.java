@@ -29,6 +29,11 @@ public class CompanyController {
         return ResponseEntity.ok(companyService.getCompanyById(id));
     }
 
+    @GetMapping("/bulk")
+    public ResponseEntity<List<Company>> getCompaniesByIds(@RequestParam("ids") List<Long> ids) {
+        return ResponseEntity.ok(companyService.getCompaniesByIds(ids));
+    }
+
     @PostMapping
     public ResponseEntity<String> createCompany(@Valid @RequestBody Company company) {
         companyService.createCompany(company);

@@ -12,6 +12,8 @@ public interface CompanyService {
 
     Company getCompanyById(Long id);
 
+    List<Company> getCompaniesByIds(List<Long> ids);
+
     void updateCompany(Long id, @Valid Company company);
 
     void deleteCompany(Long id);
